@@ -1,0 +1,5 @@
+101 execve("/bin/bash", ["bash", "-c", "bash ./steal.sh"], 0x7fff) = 0
+101 openat(AT_FDCWD</home/dev/project>, "steal.sh", O_RDONLY|O_CLOEXEC) = 3</home/dev/project/steal.sh>
+101 execve("/usr/bin/bash", ["bash", "./steal.sh"], 0x7fff) = 0
+101 openat(AT_FDCWD</home/dev>, ".ssh/id_rsa", O_RDONLY|O_CLOEXEC) = 3</home/dev/.ssh/id_rsa>
+101 exit_group(0) = ?

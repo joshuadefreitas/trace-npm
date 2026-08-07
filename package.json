@@ -1,0 +1,24 @@
+{
+  "name": "trace-npm",
+  "version": "0.1.0-alpha",
+  "description": "Forensic reports for npm lifecycle scripts.",
+  "type": "module",
+  "bin": {
+    "trace-npm": "./bin/trace-npm.js"
+  },
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check bin/trace-npm.js && node --check src/*.js"
+  },
+  "keywords": [
+    "npm",
+    "supply-chain",
+    "postinstall",
+    "strace",
+    "forensics"
+  ],
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20"
+  }
+}

