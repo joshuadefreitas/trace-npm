@@ -1,4 +1,4 @@
-import { access, mkdir, mkdtemp, readFile, rm } from "node:fs/promises";
+import { access, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { constants } from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -85,6 +85,13 @@ async function runCommand(argv) {
   const traceFile = path.join(tmpDir, "trace.log");
   const syntheticHome = path.join(tmpDir, "home");
   await mkdir(syntheticHome);
+
+  // Populate canary credentials to catch conditional exfiltration
+  await mkdir(path.join(syntheticHome, ".ssh"));
+  await writeFile(path.join(syntheticHome, ".ssh", "id_rsa"), "CANARY_KEY_DO_NOT_USE\n", { mode: 0o600 });
+  await writeFile(path.join(syntheticHome, ".npmrc"), "//registry.npmjs.org/:_authToken=npm_canary_token_do_not_use\n", { mode: 0o600 });
+  await mkdir(path.join(syntheticHome, ".aws"));
+  await writeFile(path.join(syntheticHome, ".aws", "credentials"), "[default]\naws_access_key_id=CANARY_KEY\naws_secret_access_key=CANARY_SECRET\n", { mode: 0o600 });
 
   try {
     const env = {
