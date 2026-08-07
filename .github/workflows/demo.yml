@@ -28,6 +28,7 @@ jobs:
           
           cat << 'EOF' > demo.sh
           #!/bin/bash
+          stty cols 100 rows 45
           export PS1="\$ "
           
           # Start dummy listener
@@ -39,17 +40,17 @@ jobs:
           sleep 1
           cat node_modules/demo-pkg/package.json
           echo ""
-          sleep 2.5
+          sleep 2
           echo -n "\$ "
           sleep 1
           echo "npx trace-npm run --package demo-pkg --script postinstall --i-understand-this-executes-untrusted-code --brief"
           sleep 1.5
           node bin/trace-npm.js run --package demo-pkg --script postinstall --i-understand-this-executes-untrusted-code --brief || true
-          sleep 5
+          sleep 6
           EOF
       - name: Record and Upload Asciinema
         run: |
-          env LINES=35 COLUMNS=80 asciinema rec demo.cast -c "bash demo.sh"
+          asciinema rec demo.cast -c "bash demo.sh"
       - name: Upload Cast Artifact
         uses: actions/upload-artifact@v4
         with:
