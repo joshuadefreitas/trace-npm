@@ -1,8 +1,9 @@
 # trace-npm
 
-Forensic reports for npm lifecycle scripts.
+See what an npm lifecycle script actually did: files touched, processes spawned,
+network endpoints contacted.
 
-`trace-npm` answers one narrow question:
+![trace-npm catching a package that reads ~/.ssh/id_rsa and sends it to a remote host](https://raw.githubusercontent.com/joshuadefreitas/trace-npm/main/docs/demo.gif)
 
 > What did this package script actually do on my machine?
 
