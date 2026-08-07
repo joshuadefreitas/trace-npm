@@ -1,0 +1,31 @@
+{
+  "unparsedLines": 0,
+  "missingYy": false,
+  "suspicious": [
+    {
+      "label": "ssh material",
+      "path": "~/.ssh/id_rsa",
+      "access": "read",
+      "syscall": "openat"
+    }
+  ],
+  "network": [],
+  "processes": [
+    {
+      "command": "/usr/bin/bash",
+      "status": "ok"
+    },
+    {
+      "command": "/usr/bin/cat",
+      "status": "ok"
+    }
+  ],
+  "filesOutsideCwd": [
+    "/etc/locale.alias",
+    "/tmp",
+    "/usr/bin/bash",
+    "/usr/bin/cat",
+    "~/.ssh/id_rsa",
+    "~/work/trace-npm/trace-npm/test/fixtures"
+  ]
+}

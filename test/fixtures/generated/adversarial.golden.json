@@ -1,0 +1,89 @@
+{
+  "unparsedLines": 0,
+  "missingYy": false,
+  "suspicious": [
+    {
+      "label": "ssh material",
+      "path": "~/.ssh/id_rsa",
+      "access": "read",
+      "syscall": "openat"
+    }
+  ],
+  "network": [
+    {
+      "endpoint": "127.0.0.53:53",
+      "syscall": "connect",
+      "status": "ok"
+    },
+    {
+      "endpoint": "127.0.0.53:53",
+      "syscall": "connect",
+      "status": "ok"
+    },
+    {
+      "endpoint": "127.0.0.53:53",
+      "syscall": "recvfrom",
+      "status": "ok"
+    },
+    {
+      "endpoint": "127.0.0.53:53",
+      "syscall": "recvfrom",
+      "status": "ok"
+    },
+    {
+      "endpoint": "127.0.0.53:53",
+      "syscall": "recvfrom",
+      "status": "ok"
+    },
+    {
+      "endpoint": "127.0.0.53:53",
+      "syscall": "recvfrom",
+      "status": "ok"
+    },
+    {
+      "endpoint": "unix:/var/run/nscd/socket",
+      "syscall": "connect",
+      "status": "failed"
+    },
+    {
+      "endpoint": "unix:/var/run/nscd/socket",
+      "syscall": "connect",
+      "status": "failed"
+    },
+    {
+      "endpoint": "unix:/var/run/nscd/socket",
+      "syscall": "connect",
+      "status": "failed"
+    },
+    {
+      "endpoint": "unix:/var/run/nscd/socket",
+      "syscall": "connect",
+      "status": "failed"
+    }
+  ],
+  "processes": [
+    {
+      "command": "/usr/bin/curl",
+      "status": "ok"
+    },
+    {
+      "command": "/usr/bin/cat",
+      "status": "ok"
+    }
+  ],
+  "filesOutsideCwd": [
+    "/",
+    "/etc/gnutls/config",
+    "/etc/host.conf",
+    "/etc/hosts",
+    "/etc/locale.alias",
+    "/etc/nsswitch.conf",
+    "/etc/passwd",
+    "/etc/resolv.conf",
+    "/etc/ssl/openssl.cnf",
+    "/run/systemd/resolve/stub-resolv.conf",
+    "~/.config/.curlrc",
+    "~/.curlrc",
+    "~/.ssh/id_rsa"
+  ]
+}

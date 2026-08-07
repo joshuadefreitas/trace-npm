@@ -1,0 +1,25 @@
+{
+  "unparsedLines": 0,
+  "missingYy": false,
+  "suspicious": [],
+  "network": [],
+  "processes": [
+    {
+      "command": "/opt/hostedtoolcache/node/20.20.2/x64/bin/node",
+      "status": "ok"
+    },
+    {
+      "command": "/usr/bin/touch",
+      "status": "ok"
+    },
+    {
+      "command": "/usr/bin/cat",
+      "status": "ok"
+    }
+  ],
+  "filesOutsideCwd": [
+    "/etc/locale.alias",
+    "/etc/ssl/openssl.cnf",
+    "/opt/hostedtoolcache/node/20.20.2/x64/bin/node"
+  ]
+}
