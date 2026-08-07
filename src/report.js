@@ -1,3 +1,5 @@
+import { SYSTEM_FILE_PREFIXES } from "./constants.js";
+
 const SENSITIVE_PATH_PATTERNS = [
   { label: "ssh material", regex: /(^|\/)\.ssh(\/|$)/ },
   { label: "aws credentials", regex: /(^|\/)\.aws(\/|$)/ },
@@ -176,7 +178,11 @@ export function buildReport(input) {
   };
 }
 
-export function renderMarkdownReport(report) {
+export function renderMarkdownReport(report, options = {}) {
+  const isSystemFile = (p) => SYSTEM_FILE_PREFIXES.some(prefix => p.startsWith(prefix));
+  const systemFilesHidden = !options.verbose ? report.files.filter(f => isSystemFile(f.path)).length : 0;
+  const visibleFiles = report.files.length - systemFilesHidden;
+
   const lines = [];
   lines.push(`# trace-npm report`);
   lines.push("");
@@ -189,7 +195,7 @@ export function renderMarkdownReport(report) {
   lines.push(`- Events: \`${report.summary.eventCount}\``);
   lines.push(`- Raw trace lines: \`${report.trace.rawLines}\``);
   lines.push(`- Unparsed trace lines: \`${report.trace.unparsedLines}\``);
-  lines.push(`- Files touched: \`${report.summary.fileCount}\``);
+  lines.push(`- Files touched: \`${report.summary.fileCount}\`${systemFilesHidden > 0 ? ` (${visibleFiles} outside system paths)` : ""}`);
   lines.push(`- Processes spawned: \`${report.summary.processCount}\``);
   lines.push(`- Network endpoints: \`${report.summary.networkCount}\``);
   lines.push(`- Suspicious findings: \`${report.summary.suspiciousCount}\``);
@@ -209,13 +215,27 @@ export function renderMarkdownReport(report) {
   }
 
   if (report.network.length > 0) {
-    lines.push(`## Network`);
-    lines.push("");
-    for (const event of report.network) {
-      const byCommand = event.processCommand ? ` by \`${event.processCommand}\`` : "";
-      lines.push(`- \`${event.endpoint}\`${byCommand} via \`${event.syscall}\` (${event.status})`);
+    const isDns = (ep) => ep.endsWith(":53") || ep.includes("/var/run/nscd/socket");
+    const realConnections = report.network.filter((e) => !isDns(e.endpoint));
+    const dnsConnections = report.network.filter((e) => isDns(e.endpoint));
+
+    if (realConnections.length > 0) {
+      lines.push(`## Network`);
+      lines.push("");
+      for (const event of realConnections) {
+        const byCommand = event.processCommand ? ` by \`${event.processCommand}\`` : "";
+        lines.push(`- \`${event.endpoint}\`${byCommand} via \`${event.syscall}\` (${event.status})`);
+      }
+      lines.push("");
     }
-    lines.push("");
+
+    if (dnsConnections.length > 0) {
+      lines.push(`### Name resolution (${dnsConnections.length} events)`);
+      for (const event of dnsConnections) {
+        lines.push(`- \`${event.endpoint}\``);
+      }
+      lines.push("");
+    }
   }
 
   if (report.processes.length > 0) {
@@ -233,9 +253,16 @@ export function renderMarkdownReport(report) {
   }
 
   if (report.files.length > 0) {
-    lines.push(`## Files`);
+    if (systemFilesHidden > 0) {
+      lines.push(`## Files (${visibleFiles} shown, ${systemFilesHidden} system and loader paths hidden — use --verbose)`);
+    } else {
+      lines.push(`## Files`);
+    }
     lines.push("");
     for (const file of report.files) {
+      if (!options.verbose && isSystemFile(file.path)) {
+        continue;
+      }
       lines.push(`- \`${file.path}\` [${file.access.join(", ")}] via ${file.syscalls.map((name) => `\`${name}\``).join(", ")} (${file.statuses.join(", ")})`);
     }
     lines.push("");

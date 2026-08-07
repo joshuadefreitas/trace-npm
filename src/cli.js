@@ -164,7 +164,7 @@ async function reportCommand(argv) {
 }
 
 function emitReport(report, options) {
-  const rawOutput = options.json ? `${JSON.stringify(report, null, 2)}\n` : renderMarkdownReport(report);
+  const rawOutput = options.json ? `${JSON.stringify(report, null, 2)}\n` : renderMarkdownReport(report, options);
   const { text: output, findings } = redactSecrets(rawOutput);
 
   if (findings.length > 0) {
@@ -193,6 +193,8 @@ function parseOptions(argv) {
       options[toCamelCase(rawKey.replaceAll("-", "_"))] = rawValue.join("=");
     } else if (arg === "--json") {
       options.json = true;
+    } else if (arg === "--verbose") {
+      options.verbose = true;
     } else if (arg === "--allow-secrets") {
       options.allowSecrets = true;
     } else if (arg === "--keep-trace") {
