@@ -130,6 +130,7 @@ async function runCommand(argv) {
       homeDir: os.homedir(),
     });
 
+    options.syntheticHome = syntheticHome;
     emitReport(report, options);
   } finally {
     if (!options.keepTrace) {

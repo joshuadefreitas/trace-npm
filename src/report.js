@@ -179,6 +179,13 @@ export function buildReport(input) {
 }
 
 export function renderMarkdownReport(report, options = {}) {
+  const formatPath = (p) => {
+    if (options.syntheticHome && p.startsWith(options.syntheticHome)) {
+      return p.replace(options.syntheticHome, "~") + " (canary)";
+    }
+    return p;
+  };
+
   const isSystemFile = (p) => SYSTEM_FILE_PREFIXES.some(prefix => p.startsWith(prefix));
   const systemFilesHidden = !options.verbose ? report.files.filter(f => isSystemFile(f.path)).length : 0;
   const visibleFiles = report.files.length - systemFilesHidden;
@@ -209,7 +216,7 @@ export function renderMarkdownReport(report, options = {}) {
     lines.push("");
     for (const finding of report.suspicious) {
       const byCommand = finding.processCommand ? ` by \`${finding.processCommand}\`` : "";
-      lines.push(`- ${finding.label}: \`${finding.path}\`${byCommand} (${finding.access}, ${finding.syscall})`);
+      lines.push(`- ${finding.label}: \`${formatPath(finding.path)}\`${byCommand} (${finding.access}, ${finding.syscall})`);
     }
     lines.push("");
   }
@@ -231,8 +238,16 @@ export function renderMarkdownReport(report, options = {}) {
 
     if (dnsConnections.length > 0) {
       lines.push(`### Name resolution (${dnsConnections.length} events)`);
+      const counts = {};
       for (const event of dnsConnections) {
-        lines.push(`- \`${event.endpoint}\``);
+        counts[event.endpoint] = (counts[event.endpoint] || 0) + 1;
+      }
+      for (const [ep, count] of Object.entries(counts)) {
+        if (count > 1) {
+          lines.push(`- \`${ep}\` (x${count})`);
+        } else {
+          lines.push(`- \`${ep}\``);
+        }
       }
       lines.push("");
     }
@@ -263,7 +278,7 @@ export function renderMarkdownReport(report, options = {}) {
       if (!options.verbose && isSystemFile(file.path)) {
         continue;
       }
-      lines.push(`- \`${file.path}\` [${file.access.join(", ")}] via ${file.syscalls.map((name) => `\`${name}\``).join(", ")} (${file.statuses.join(", ")})`);
+      lines.push(`- \`${formatPath(file.path)}\` [${file.access.join(", ")}] via ${file.syscalls.map((name) => `\`${name}\``).join(", ")} (${file.statuses.join(", ")})`);
     }
     lines.push("");
   }
@@ -280,6 +295,9 @@ export function renderMarkdownReport(report, options = {}) {
     lines.push("");
   } else {
     lines.push(`- Run without \`--brief\` for the full report.`);
+    if (report.network.some(e => e.status === "pending")) {
+      lines.push(`- pending = connection was initiated (non-blocking); final outcome not traced.`);
+    }
     lines.push("");
   }
 

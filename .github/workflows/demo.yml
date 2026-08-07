@@ -46,6 +46,7 @@ jobs:
           sleep 1.5
           node bin/trace-npm.js run --package demo-pkg --script postinstall --i-understand-this-executes-untrusted-code --brief || true
           sleep 6
+          echo -n " "
           EOF
       - name: Record and Upload Asciinema
         run: |
