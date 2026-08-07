@@ -41,7 +41,12 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: fixtures
-        path: test/fixtures/
+        path: test/fixtures/generated/
         
     - name: Check for fixture drift
-      run: git diff --exit-code test/fixtures/*.golden.json
+      run: |
+        ls test/fixtures/generated/*.golden.json >/dev/null 2>&1 \
+          || { echo "No golden fixtures committed — drift check would pass vacuously"; exit 1; }
+        git diff --exit-code test/fixtures/generated/*.golden.json
+        test -z "$(git status --porcelain test/fixtures/generated/*.golden.json)" \
+          || { echo "untracked golden fixtures"; git status --porcelain test/fixtures/generated/; exit 1; }

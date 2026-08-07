@@ -1,3 +1,4 @@
+# Hand-authored unit test fixture
 101 execve("/bin/sh", ["sh", "-lc", "node postinstall.js"], 0x7fff0000) = 0
 101 openat(AT_FDCWD, "/home/dev/project/node_modules/suspect/package.json", O_RDONLY|O_CLOEXEC) = 3
 101 openat(AT_FDCWD, "/home/dev/.ssh/id_rsa", O_RDONLY|O_CLOEXEC) = 3

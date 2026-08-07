@@ -15,9 +15,74 @@ export function buildReport(input) {
   const suspicious = [];
   const homeDir = input.homeDir;
 
+  // Pass 1: Identify and suppress failed PATH search probes (ENOENT stat-family events)
+  const STAT_SYSCALLS = new Set(["stat", "lstat", "newfstatat", "statx", "access", "faccessat", "faccessat2"]);
+  const probes = new Map();
+
+  for (const event of input.events) {
+    if (event.kind === "file" && event.paths) {
+      const isStat = STAT_SYSCALLS.has(event.syscall);
+      for (const rawPath of event.paths) {
+        const parts = rawPath.split('/');
+        const basename = parts.pop();
+        const dir = parts.join('/');
+        
+        let pidMap = probes.get(event.pid);
+        if (!pidMap) { pidMap = new Map(); probes.set(event.pid, pidMap); }
+        
+        let probeInfo = pidMap.get(basename);
+        if (!probeInfo) { probeInfo = { dirs: new Set(), failedEvents: [], hasSuccess: false }; pidMap.set(basename, probeInfo); }
+        
+        probeInfo.dirs.add(dir);
+        
+        const isError = event.result && event.result.includes("ENOENT");
+        if (isStat && isError) {
+          probeInfo.failedEvents.push({ event, rawPath });
+        } else if (event.result === "0" || (event.result && !event.result.startsWith("-1"))) {
+          probeInfo.hasSuccess = true;
+        }
+      }
+    }
+  }
+
+  const suppressedPaths = new Map();
+  let pathSearchProbesSuppressed = 0;
+
+  for (const pidMap of probes.values()) {
+    for (const info of pidMap.values()) {
+      if (info.dirs.size > 1) { // It's a search across multiple directories
+        const nonSensitiveFails = info.failedEvents.filter(e => classifySensitivePath(e.rawPath).length === 0);
+        
+        if (info.hasSuccess) {
+          // Resolved successfully: suppress all non-sensitive failed probes
+          for (const e of nonSensitiveFails) {
+            let s = suppressedPaths.get(e.event);
+            if (!s) { s = new Set(); suppressedPaths.set(e.event, s); }
+            s.add(e.rawPath);
+            pathSearchProbesSuppressed++;
+          }
+        } else {
+          // Never resolves: collapse to ONE entry (keep the first, suppress the rest)
+          if (nonSensitiveFails.length > 0) {
+            for (let i = 1; i < nonSensitiveFails.length; i++) {
+              let s = suppressedPaths.get(nonSensitiveFails[i].event);
+              if (!s) { s = new Set(); suppressedPaths.set(nonSensitiveFails[i].event, s); }
+              s.add(nonSensitiveFails[i].rawPath);
+              pathSearchProbesSuppressed++;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Pass 2: Build the report
   for (const event of input.events) {
     if (event.kind === "file") {
       for (const rawPath of event.paths ?? []) {
+        if (suppressedPaths.get(event)?.has(rawPath)) {
+          continue; // suppressed PATH probe
+        }
         const normalized = redactHome(normalizePath(rawPath), homeDir);
         const existing = files.get(normalized) ?? {
           path: normalized,
@@ -88,6 +153,7 @@ export function buildReport(input) {
       processCount: processes.length,
       networkCount: network.length,
       suspiciousCount: dedupedSuspicious.length,
+      pathSearchProbesSuppressed,
     },
     files: [...files.values()].map((file) => ({
       path: file.path,
@@ -127,6 +193,9 @@ export function renderMarkdownReport(report) {
   lines.push(`- Processes spawned: \`${report.summary.processCount}\``);
   lines.push(`- Network endpoints: \`${report.summary.networkCount}\``);
   lines.push(`- Suspicious findings: \`${report.summary.suspiciousCount}\``);
+  if (report.summary.pathSearchProbesSuppressed > 0) {
+    lines.push(`- Suppressed PATH probes: \`${report.summary.pathSearchProbesSuppressed}\``);
+  }
   lines.push("");
 
   if (report.suspicious.length > 0) {

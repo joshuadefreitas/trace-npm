@@ -5,11 +5,11 @@ import { parseStrace } from "../src/strace-parser.js";
 import { buildReport } from "../src/report.js";
 
 test("parses strace file, process, and network events", async () => {
-  const text = await readFile(new URL("./fixtures/postinstall.strace", import.meta.url), "utf8");
+  const text = await readFile(new URL("./fixtures/unit/postinstall.strace", import.meta.url), "utf8");
   const events = parseStrace(text);
 
   assert.equal(events.length, 6); // First 4 are dropped as wrapper noise
-  assert.equal(events.stats.rawLines, 11);
+  assert.equal(events.stats.rawLines, 12);
   assert.equal(events.stats.unparsedLines, 0);
   assert.equal(events.stats.resumedLines, 1);
   assert.equal(events.stats.missingYy, false); // It actually does have some hand-authored -yy annotations
@@ -27,7 +27,7 @@ test("parses strace file, process, and network events", async () => {
 });
 
 test("builds suspicious path report", async () => {
-  const text = await readFile(new URL("./fixtures/postinstall.strace", import.meta.url), "utf8");
+  const text = await readFile(new URL("./fixtures/unit/postinstall.strace", import.meta.url), "utf8");
   const events = parseStrace(text);
   const report = buildReport({
     packageName: "suspect",
@@ -50,7 +50,7 @@ test("builds suspicious path report", async () => {
 });
 
 test("attributes events to child processes in adversarial fixture", async () => {
-  const text = await readFile(new URL("./fixtures/adversarial.strace", import.meta.url), "utf8");
+  const text = await readFile(new URL("./fixtures/unit/adversarial.strace", import.meta.url), "utf8");
   const events = parseStrace(text);
   const report = buildReport({
     packageName: "suspect",
@@ -70,7 +70,7 @@ test("attributes events to child processes in adversarial fixture", async () => 
 });
 
 test("tracks child processes in benign fixture", async () => {
-  const text = await readFile(new URL("./fixtures/benign.strace", import.meta.url), "utf8");
+  const text = await readFile(new URL("./fixtures/unit/benign.strace", import.meta.url), "utf8");
   const events = parseStrace(text);
   const report = buildReport({
     packageName: "safe",
@@ -86,7 +86,7 @@ test("tracks child processes in benign fixture", async () => {
 });
 
 test("D1: captures shell payload in-place exec (bash ./steal.sh)", async () => {
-  const text = await readFile(new URL("./fixtures/steal.strace", import.meta.url), "utf8");
+  const text = await readFile(new URL("./fixtures/unit/steal.strace", import.meta.url), "utf8");
   const events = parseStrace(text);
   const report = buildReport({
     packageName: "suspect",
@@ -99,4 +99,26 @@ test("D1: captures shell payload in-place exec (bash ./steal.sh)", async () => {
   assert.equal(report.summary.suspiciousCount, 1);
   assert.equal(report.suspicious[0].label, "ssh material");
   assert.equal(report.suspicious[0].path, "/home/dev/.ssh/id_rsa");
+});
+
+test("PATH probe suppression: collapses unresolved and suppresses resolved", async () => {
+  const text = await readFile(new URL("./fixtures/unit/probes.strace", import.meta.url), "utf8");
+  const events = parseStrace(text);
+  const report = buildReport({
+    packageName: "suspect",
+    scriptName: "postinstall",
+    command: "bash ./payload.sh",
+    cwd: "/home/dev/project",
+    events,
+  });
+
+  // curl: 2 failures suppressed because of 1 success
+  // missing: 1 failure kept (collapsed), 1 failure suppressed
+  // Total suppressed: 3
+  assert.equal(report.summary.pathSearchProbesSuppressed, 3);
+  
+  // The only files kept are the first probe for `missing` and the successful one for `curl`
+  assert.equal(report.summary.fileCount, 2);
+  assert.ok(report.files.find(f => f.path === "/usr/local/bin/missing"));
+  assert.ok(report.files.find(f => f.path === "/bin/curl"));
 });

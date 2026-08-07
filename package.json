@@ -1,11 +1,17 @@
 {
   "name": "trace-npm",
   "version": "0.1.0-alpha",
-  "description": "Forensic reports for npm lifecycle scripts.",
+  "description": "See what an npm lifecycle script actually did: files touched, processes spawned, network endpoints contacted. Linux + strace.",
   "type": "module",
   "bin": {
     "trace-npm": "./bin/trace-npm.js"
   },
+  "files": [
+    "bin/",
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "test": "node --test",
     "check": "node --check bin/trace-npm.js && node --check src/*.js"
@@ -14,10 +20,24 @@
     "npm",
     "supply-chain",
     "postinstall",
+    "install-scripts",
     "strace",
-    "forensics"
+    "forensics",
+    "security",
+    "audit",
+    "provenance",
+    "syscall"
   ],
+  "author": "Joshua de Freitas",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joshuadefreitas/trace-npm.git"
+  },
+  "bugs": {
+    "url": "https://github.com/joshuadefreitas/trace-npm/issues"
+  },
+  "homepage": "https://github.com/joshuadefreitas/trace-npm#readme",
   "engines": {
     "node": ">=20"
   }

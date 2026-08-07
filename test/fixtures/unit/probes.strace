@@ -1,0 +1,9 @@
+# Hand-authored unit test fixture
+101 execve("/bin/bash", ["bash", "-c", "missing; curl"], 0x7fff0000) = 0
+101 execve("/usr/bin/bash", ["bash", "payload"], 0x7fff0000) = 0
+101 newfstatat(AT_FDCWD</home/dev>, "/usr/local/bin/missing", 0x7fff, 0) = -1 ENOENT (No such file or directory)
+101 newfstatat(AT_FDCWD</home/dev>, "/usr/bin/missing", 0x7fff, 0) = -1 ENOENT (No such file or directory)
+101 newfstatat(AT_FDCWD</home/dev>, "/usr/local/bin/curl", 0x7fff, 0) = -1 ENOENT (No such file or directory)
+101 newfstatat(AT_FDCWD</home/dev>, "/usr/bin/curl", 0x7fff, 0) = -1 ENOENT (No such file or directory)
+101 newfstatat(AT_FDCWD</home/dev>, "/bin/curl", 0x7fff, 0) = 0
+101 exit_group(0) = ?

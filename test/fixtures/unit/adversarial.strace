@@ -1,3 +1,4 @@
+# Hand-authored unit test fixture
 101 execve("/bin/sh", ["sh", "-c", "node postinstall.js"], 0x7fff0000) = 0
 101 clone(child_stack=NULL, flags=CLONE_CHILD_CLEARTID|CLONE_CHILD_SETTID|SIGCHLD, child_tidptr=0x7f8) = 102
 101 wait4(102,  <unfinished ...>

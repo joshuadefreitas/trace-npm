@@ -1,6 +1,12 @@
 node_modules/
 coverage/
-*.log
 dist/
+*.log
 .DS_Store
 .Rhistory
+
+# Generated fixtures: only the golden projections are tracked.
+# Raw traces and full reports contain pids, temp-dir names and memory addresses,
+# so they can never be byte-stable. They remain available as the CI artifact.
+test/fixtures/generated/*.strace
+test/fixtures/generated/*.report.json
