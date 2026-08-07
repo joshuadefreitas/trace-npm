@@ -46,6 +46,24 @@ untrusted packages. The current host runner uses a synthetic `HOME`, timeout,
 and explicit danger flag, but it is not a sandbox. A disposable container runner
 is required before this should be treated as a safer detonation workflow.
 
+### Canary Credentials
+
+When `trace-npm run` executes a script, it provides a synthetic `HOME` directory. To catch scripts that silently check for the existence of high-value targets before deciding to steal them (conditional exfiltration), `trace-npm` populates this `HOME` with inert, fake credentials:
+- `~/.ssh/id_rsa`
+- `~/.npmrc`
+- `~/.aws/credentials`
+
+These tokens are marked `CANARY` and are unusable. If a script attempts to read them, it will trip the canary and leave undeniable proof of malicious intent in the trace report.
+
+## Running on macOS / Windows (Docker)
+
+`trace-npm run` requires Linux and `strace`. If you are on macOS or Windows, you can safely run it using this Docker one-liner from the root of your project:
+
+```sh
+docker run -it --rm -v "$PWD":/w -w /w ubuntu:24.04 bash -c \
+  "apt-get update -qq && apt-get install -y -qq strace nodejs npm && npm install --ignore-scripts && npx trace-npm run --package <target-package> --script postinstall --i-understand-this-executes-untrusted-code"
+```
+
 Install dependencies with scripts disabled, then inspect lifecycle scripts before
 approving them.
 
