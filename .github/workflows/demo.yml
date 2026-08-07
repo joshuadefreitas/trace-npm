@@ -42,10 +42,8 @@ jobs:
       - name: Record and Upload Asciinema
         run: |
           asciinema rec demo.cast -c "bash demo.sh"
-          echo -en '\n' | asciinema upload demo.cast > upload_url.txt || true
-          cat upload_url.txt
-      - name: Upload URL Artifact
+      - name: Upload Cast Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: asciinema-url
-          path: upload_url.txt
+          name: asciinema-cast
+          path: demo.cast
