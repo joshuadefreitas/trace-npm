@@ -252,7 +252,7 @@ export function renderMarkdownReport(report, options = {}) {
     lines.push("");
   }
 
-  if (report.files.length > 0) {
+  if (!options.brief && report.files.length > 0) {
     if (systemFilesHidden > 0) {
       lines.push(`## Files (${visibleFiles} shown, ${systemFilesHidden} system and loader paths hidden — use --verbose)`);
     } else {
@@ -268,15 +268,20 @@ export function renderMarkdownReport(report, options = {}) {
     lines.push("");
   }
 
-  lines.push(`## Limitations`);
-  lines.push("");
-  for (const limitation of report.limitations) {
-    lines.push(`- ${limitation}`);
+  if (!options.brief) {
+    lines.push(`## Limitations`);
+    lines.push("");
+    for (const limitation of report.limitations) {
+      lines.push(`- ${limitation}`);
+    }
+    if (report.trace.unparsedLines > 0) {
+      lines.push(`- ${report.trace.unparsedLines} trace lines could not be parsed and are not represented in detail.`);
+    }
+    lines.push("");
+  } else {
+    lines.push(`- Run without \`--brief\` for the full report.`);
+    lines.push("");
   }
-  if (report.trace.unparsedLines > 0) {
-    lines.push(`- ${report.trace.unparsedLines} trace lines could not be parsed and are not represented in detail.`);
-  }
-  lines.push("");
 
   return `${lines.join("\n")}\n`;
 }

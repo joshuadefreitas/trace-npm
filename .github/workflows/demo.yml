@@ -33,19 +33,23 @@ jobs:
           # Start dummy listener
           node -e 'require("net").createServer(s=>{s.on("data",()=>{});s.end()}).listen(9999,"127.0.0.1")' &
           
-          echo "\$ cat node_modules/demo-pkg/package.json"
+          echo -n "\$ "
+          sleep 1
+          echo "cat node_modules/demo-pkg/package.json"
           sleep 1
           cat node_modules/demo-pkg/package.json
           echo ""
-          sleep 2
-          echo "\$ npx trace-npm run --package demo-pkg --script postinstall --i-understand-this-executes-untrusted-code"
+          sleep 2.5
+          echo -n "\$ "
           sleep 1
-          node bin/trace-npm.js run --package demo-pkg --script postinstall --i-understand-this-executes-untrusted-code || true
-          sleep 4
+          echo "npx trace-npm run --package demo-pkg --script postinstall --i-understand-this-executes-untrusted-code --brief"
+          sleep 1.5
+          node bin/trace-npm.js run --package demo-pkg --script postinstall --i-understand-this-executes-untrusted-code --brief || true
+          sleep 5
           EOF
       - name: Record and Upload Asciinema
         run: |
-          asciinema rec demo.cast -c "bash demo.sh"
+          env LINES=35 COLUMNS=80 asciinema rec demo.cast -c "bash demo.sh"
       - name: Upload Cast Artifact
         uses: actions/upload-artifact@v4
         with:

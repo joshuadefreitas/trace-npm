@@ -195,6 +195,8 @@ function parseOptions(argv) {
       options.json = true;
     } else if (arg === "--verbose") {
       options.verbose = true;
+    } else if (arg === "--brief") {
+      options.brief = true;
     } else if (arg === "--allow-secrets") {
       options.allowSecrets = true;
     } else if (arg === "--keep-trace") {
