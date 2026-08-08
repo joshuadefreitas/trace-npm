@@ -4,7 +4,7 @@
   "description": "See what an npm lifecycle script actually did: files touched, processes spawned, network endpoints contacted. Linux + strace.",
   "type": "module",
   "bin": {
-    "trace-npm": "./bin/trace-npm.js"
+    "trace-npm": "bin/trace-npm.js"
   },
   "files": [
     "bin/",
