@@ -26,6 +26,9 @@ jobs:
           }
           EOF
           
+          # Pre-generate the report
+          node bin/trace-npm.js run --package demo-pkg --script postinstall --i-understand-this-executes-untrusted-code --brief > pre_report.txt || true
+          
           cat << 'EOF' > demo.sh
           #!/bin/bash
           export PS1="\$ "
@@ -33,6 +36,14 @@ jobs:
           # Start dummy listener
           node -e 'require("net").createServer(s=>{s.on("data",()=>{});s.end()}).listen(9999,"127.0.0.1")' &
           
+          # Start with report already on screen
+          clear
+          cat pre_report.txt
+          echo -n "\$ "
+          sleep 3
+          
+          # Now run the normal sequence
+          clear
           echo -n "\$ "
           sleep 1
           echo "cat node_modules/demo-pkg/package.json"
