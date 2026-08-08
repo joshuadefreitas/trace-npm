@@ -54,7 +54,7 @@ When `trace-npm run` executes a script, it provides a synthetic `HOME` directory
 - `~/.npmrc`
 - `~/.aws/credentials`
 
-These tokens are marked `CANARY` and are unusable. If a script attempts to read them, it will trip the canary and leave undeniable proof of malicious intent in the trace report.
+These tokens are marked `CANARY` and are unusable. If a script reads them, the trace report records a read of a credential the script had no legitimate reason to need. That is evidence, not proof of intent — a deploy helper can touch the same paths for honest reasons. The report says what happened; deciding what it means is your job.
 
 ## Running on macOS / Windows (Docker)
 
