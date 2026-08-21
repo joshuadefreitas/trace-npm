@@ -1,6 +1,19 @@
 # AGENTS
 
-_Repository-specific rules go above the shared block._
+trace-npm is a Ghalvera product. Its repository and release decisions remain
+independent from the Ghalvera programme repository.
+
+- Every traced target is owned or explicitly authorized. The host runner is
+  not a sandbox and must never be described as one.
+- For this repository, Grok 4.6 High Fast via Cursor supersedes the shared
+  protocol's dated DeepSeek assignment for frozen-packet forensic line review.
+  The author of a unit never reviews that unit.
+- Run the review workflow at
+  `/Users/joshuadefreitas/myworld/shared/agent-review/README.md` after material
+  implementation changes. This is an absolute workspace path, not a path
+  inside this independent repository.
+- Do not commit, push, publish a package release, create a remote or change
+  visibility without explicit authorization.
 
 
 <!-- BEGIN SHARED PROTOCOL v1 -->
