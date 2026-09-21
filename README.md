@@ -1,8 +1,6 @@
 # trace-npm
 
-A Ghalvera product for inspecting npm lifecycle-script behavior.
-
-See what an npm lifecycle script actually did: files touched, processes spawned,
+ASee what an npm lifecycle script actually did: files touched, processes spawned,
 network endpoints contacted.
 
 ![trace-npm catching a package that reads ~/.ssh/id_rsa and sends it to a remote host](docs/demo.gif)
